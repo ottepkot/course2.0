@@ -1,0 +1,48 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Получаем исходный код с `docker-compose.yml`
+                checkout scm
+            }
+        }
+        stage('Build and Deploy ELK Stack') {
+            steps {
+                script {
+                    // Запускаем Docker Compose для развертывания ELK стека
+                    sh 'docker-compose up -d'
+                }
+            }
+        }
+        stage('Verify ELK Stack') {
+            steps {
+                script {
+                    // Проверяем, что контейнеры запущены
+                    sh 'docker ps'
+                    
+                    // Проверяем доступность сервисов через curl
+                    sh 'curl -XGET http://localhost:9200'
+                    sh 'curl -XGET http://localhost:5601'
+                }
+            }
+        }
+        stage('Cleanup') {
+            steps {
+                script {
+                    // Останавливаем и удаляем контейнеры (если нужно)
+                    sh 'docker-compose down'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Выполняем после завершения Pipeline (успешно или нет)
+            cleanWs()
+        }
+    }
+}
+
