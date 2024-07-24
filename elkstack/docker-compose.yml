@@ -26,5 +26,18 @@ services:
     ports:
       - "5602:5601"  # Используем другой порт на хосте для Kibana
 
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "8082:80"  # Измените порт на хосте для Nginx
+
+  httpd:
+    image: httpd:latest
+    container_name: httpd
+    ports:
+      - "8083:80"  # Измените порт на хосте для HTTPD
+
 volumes:
   elasticsearch-data:
+
